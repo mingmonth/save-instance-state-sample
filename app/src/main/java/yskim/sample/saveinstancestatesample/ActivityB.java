@@ -2,34 +2,36 @@ package yskim.sample.saveinstancestatesample;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class ActivityB extends AppCompatActivity {
 
     @BindView(R.id.editText)
     EditText editText;
+    @BindView(R.id.textView)
+    TextView textView;
 
     static final String INPUT_DATA = "input_data";
+    static final String SCREEN_DATA = "screen_data";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-//        if (savedInstanceState == null) {
-//            Intent intent = getIntent();
-//            Bundle savedState = intent.getBundleExtra("saved_state");
-//            if (savedState != null) {
-//                onRestoreInstanceState(savedState);
-//            }
-//        }
-
         setContentView(R.layout.activity_b);
         ButterKnife.bind(this);
-        if(savedInstanceState != null) {
+
+        textView.setMovementMethod(new ScrollingMovementMethod());
+
+        if (savedInstanceState != null) {
             Debug.logd(new Exception(), "");
             String data = savedInstanceState.getString(INPUT_DATA);
             editText.setText(data);
@@ -37,36 +39,25 @@ public class ActivityB extends AppCompatActivity {
             Intent intent = getIntent();
             Debug.logd(new Exception(), "");
             Bundle savedState = intent.getBundleExtra("saved_state");
-            if(savedState != null) {
-                String data = savedState.getString(INPUT_DATA);
-                Debug.logd(new Exception(), "data: " + data);
-                editText.setText(data);
-                //editText.setText(data);
-//            if (savedState != null) {
-//                onRestoreInstanceState(savedState);
-//            }
+            if (savedState != null) {
+                String screenData = savedState.getString(SCREEN_DATA);
+                String inputData = savedState.getString(INPUT_DATA);
+                Debug.logd(new Exception(), "screenData: " + screenData);
+                Debug.logd(new Exception(), "inputData: " + inputData);
+                textView.setText(screenData);
+                editText.setText(inputData);
             }
         }
         super.onCreate(savedInstanceState);
     }
 
     @Override
-    protected void onPause() {
-//        Debug.logd(new Exception(), "");
-//        Bundle savedState = new Bundle();
-//        String inputData = editText.getText().toString();
-//        savedState.putString(INPUT_DATA, inputData);
-//        Intent data = new Intent();
-//        data.putExtra("saved_state", savedState);
-//        setResult(1, data);
-        super.onPause();
-    }
-
-    @Override
     public void onBackPressed() {
         Debug.logd(new Exception(), "");
         Bundle savedState = new Bundle();
+        String screenData = textView.getText().toString();
         String inputData = editText.getText().toString();
+        savedState.putString(SCREEN_DATA, screenData);
         savedState.putString(INPUT_DATA, inputData);
         Intent data = new Intent();
         data.putExtra("saved_state", savedState);
@@ -75,30 +66,44 @@ public class ActivityB extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-//        Bundle savedState = new Bundle();
-//        if (savedState != null) {
-//            onSaveInstanceState(savedState);
-//        }
-//        Intent data = new Intent();
-//        data.putExtra("saved_state", savedState);
-//        setResult(RESULT_OK, data);
-        super.onDestroy();
-//        Debug.logd(new Exception(), "");
-//        Bundle savedState = new Bundle();
-//        String inputData = editText.getText().toString();
-//        savedState.putString(INPUT_DATA, inputData);
-//        Intent data = new Intent();
-//        data.putExtra("saved_state", savedState);
-//        setResult(1, data);
-
-    }
-
-    @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        Debug.logd(new Exception(), "");
         String inputData = editText.getText().toString();
         outState.putString(INPUT_DATA, inputData);
+    }
+
+    @OnClick({R.id.button})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.button:
+                setTextView();
+                break;
+        }
+    }
+
+    private void setTextView() {
+        String textViewContents = textView.getText().toString();
+        String editTextContents = editText.getText().toString();
+        StringBuilder sb = new StringBuilder();
+        if(textViewContents != null) {
+            sb.append(textView.getText().toString());
+            sb.append("\n");
+        }
+
+        sb.append(editTextContents);
+
+        textView.setText(sb.toString());
+        scrollBottom(textView);
+        editText.setText(null);
+    }
+
+    private void scrollBottom(TextView textView) {
+        int lineTop =  textView.getLayout().getLineTop(textView.getLineCount()) ;
+        int scrollY = lineTop - textView.getHeight();
+        if (scrollY > 0) {
+            textView.scrollTo(0, scrollY);
+        } else {
+            textView.scrollTo(0, 0);
+        }
     }
 }

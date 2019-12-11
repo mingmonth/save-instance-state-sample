@@ -29,7 +29,9 @@ public class ActivityA extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             Debug.logd(new Exception(), "");
             activityBData = data.getBundleExtra("saved_state");
+            String screenData = activityBData.getString("screen_data");
             String inputData = activityBData.getString("input_data");
+            Debug.logd(new Exception(), "screenData: " + screenData);
             Debug.logd(new Exception(), "inputData: " + inputData);
         }
     }
