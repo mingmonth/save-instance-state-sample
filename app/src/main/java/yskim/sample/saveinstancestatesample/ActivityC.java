@@ -208,24 +208,21 @@ public class ActivityC extends AppCompatActivity {
         initializeData();
     }
 
+    private String getString(View view) {
+        return view.getResources().getResourceName(view.getId());
+    }
+
     @OnClick({R.id.led1, R.id.led3, R.id.led5, R.id.led2, R.id.led4, R.id.led6, R.id.input1, R.id.input4, R.id.input7, R.id.input2, R.id.input5, R.id.input8, R.id.input3, R.id.input6, R.id.input9})
     public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.led1: ledIndex = 0; break;
-            case R.id.led2: ledIndex = 1; break;
-            case R.id.led3: ledIndex = 2; break;
-            case R.id.led4: ledIndex = 3; break;
-            case R.id.led5: ledIndex = 4; break;
-            case R.id.led6: ledIndex = 5; break;
-            case R.id.input1: inputIndex = 0; checkData(ledIndex, inputIndex); break;
-            case R.id.input2: inputIndex = 1; checkData(ledIndex, inputIndex); break;
-            case R.id.input3: inputIndex = 2; checkData(ledIndex, inputIndex); break;
-            case R.id.input4: inputIndex = 3; checkData(ledIndex, inputIndex); break;
-            case R.id.input5: inputIndex = 4; checkData(ledIndex, inputIndex); break;
-            case R.id.input6: inputIndex = 5; checkData(ledIndex, inputIndex); break;
-            case R.id.input7: inputIndex = 6; checkData(ledIndex, inputIndex); break;
-            case R.id.input8: inputIndex = 7; checkData(ledIndex, inputIndex); break;
-            case R.id.input9: inputIndex = 8; checkData(ledIndex, inputIndex); break;
+        // view id 값에서 string 을 얻어서 처리. 컴포넌트가 늘어났을 때, switch case 문이 늘어나는것을 방지하기 위해서.
+        String target = getString(view);
+        // led 면.. 그 다음부터 숫자에 - 1 값이 ledIndex
+        if(target.contains("led")) {
+            ledIndex = (Integer.parseInt(target.substring(target.lastIndexOf("led")).replace("led", "")) - 1);
+        } else if(target.contains("input")) { // input 이면.. 그 다음부터 숫자에 - 1 값이 inputIndex
+            inputIndex = (Integer.parseInt(target.substring(target.lastIndexOf("input")).replace("input", "")) - 1);
+            // input 일 때만 checkData 처리.
+            checkData(ledIndex, inputIndex);
         }
         currentLedName.setText("LED" + (ledIndex + 1));
         setBackgroundToLED(ledIndex);
